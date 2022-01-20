@@ -1,0 +1,15 @@
+Steps to proceede to calibrate TWIM Music (work in progress)
+------------------------------------------------------------
+
+1)	-First we have to calibrate the Energy for the anodes for all section (taking a reference anode; I used anodenr 5)
+	-first run the program "small_script_hist.C" for all subruns -> then use hadd to add up the .root files
+	the combined .root file can then be used for the script called "retrieve_fits_hist.C" -> this one makes nice canvases for the plots anode[i] vs anode_ref and stores the fit parameters under 
+	parameters_twim_anodes.csv
+	-Design of "parameters_twim_anodes.csv":
+		it stores section(s),anodenr(i),slope,offset --> E_anode[i][s] = E_sum_ref*slope[i][s] + offset[i][s]
+		To calibrate you have to do it the way round: E_cal_anode[i][s] = E_anode[i][s]/slope[i][s] -offset[i][s]/slope[i][s]
+
+2) 	Calibration of the summed energy in the sections
+	-run the macro "twim_sum_energy.C" using all subruns as input parameter. As output you get a .root file with 1D histos with the summed TWIM energy for each sections
+	-use the output .root file from "twim_sum_energy.C" as input file for the macro "e_sum_cal.C". This uses TSpectra etc. to (linearly) calibrate the E_sum energy for all sections (fit parameters stored in sum_anodes_parameters.csv)	
+3)  Now you can use macro "twim_final_cal.C" (as input parameters the name of the subruns). This macro uses both parameter files parameters_twim_anodes.csv (anode fit) and sum_anodes_parameters.csv (summed Energy fit). Now E_sum is calibrated 
